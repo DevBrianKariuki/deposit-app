@@ -12,7 +12,7 @@ const Navbar = () => {
   const { pathname } = useLocation()
 
   return (
-    <nav className={`bg-background w-full overflow-hidden bottom-0 right-0 left-0 z-5 fixed`}>
+    <nav className={`bg-navyBlue border-t-[1px] border-navBorder w-full overflow-hidden bottom-0 right-0 left-0 z-5 fixed`}>
       <div className='flex flex-row items-center justify-between p-6'>
         <Link to={'/'}>
           <div className={` flex flex-col items-center  ${pathname === '/' ? 'text-orange' : 'text-white' } `}>

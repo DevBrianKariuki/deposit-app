@@ -13,6 +13,7 @@ export default {
         lightBlue: "#A8A8C7",
         white: "#FFFFFF",
         lightGray: "#BBBBBB",
+        navBorder: "#3F3F5F",
       },
       fontFamily: {
         inter: ["inter", "sans-serif"],

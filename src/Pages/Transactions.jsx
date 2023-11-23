@@ -6,7 +6,7 @@ const Transactions = () => {
   return (
     <div className='bg-background flex flex-col w-full overflow-hidden'>
 
-    <div className={`flex flex-col items-center px-4`}>
+      <div className={`flex flex-col items-center px-4`}>
         <div className='mt-12 mb-6 justify-center'>
           <p className='font-inter text-white font-bold text-2xl'>Transactions</p>
         </div>
@@ -23,7 +23,7 @@ const Transactions = () => {
         < TransactionCard type={'D'} amount={'2,850.00'} desc={'Service'} date={'23 Nov 2023'}/>
       </div>
 
-    </div>
+      </div>
 
     </div>
   )
