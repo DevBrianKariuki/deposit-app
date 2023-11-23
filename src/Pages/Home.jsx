@@ -1,8 +1,13 @@
-import React from 'react'
+import React , {useState} from 'react'
 import styles from '../styles'
-import balanceCard from '../Components/balanceCard'
+import { FaChevronRight } from "react-icons/fa";
+import { Button, Modal } from 'flowbite-react';
+import { IoMdCheckmarkCircleOutline } from "react-icons/io"
+
 
 const Home = () => {
+  const [openModal, setOpenModal] = useState(false);
+
   return (
     <div className='bg-background w-full overflow-hidden '>
 
@@ -17,9 +22,43 @@ const Home = () => {
         </div>
         
         <div className='flex flex-col items-center my-5 gap-5'>
-          <button className='text-white  text-md w-[70%] font-inter bg-orange w-full font-semibold py-6 rounded-xl'>Confirm Deposit</button>
-          <button className='text-white text-md font-inter w-[70%] bg-lightBlue w-full font-semibold py-6  rounded-xl'>Confirm Withdrawal</button>
+          <button  className='text-white flex justify-center items-center gap-4  text-md w-[70%] font-inter bg-orange w-full font-semibold py-6 rounded-xl'
+          onClick={() => setOpenModal(true)}>
+            Confirm Deposit
+            <FaChevronRight />
+            </button>
+
+
+              <Modal show={openModal} onClose={() => setOpenModal(false)}>
+                <Modal.Header className="flex items-center justify-center">
+                  <h1 clas>DEPOSIT</h1>
+                </Modal.Header>
+                <Modal.Body>
+                  <div className="space-y-6">
+                    
+                    
+                  </div>
+                </Modal.Body>
+                <Modal.Footer className="flex items-center justify-center">
+                  <button className="bg-orange font-inter text-lg flex items-center gap-3 font-semibold rounded-xl text-white px-12 py-4" 
+                    onClick={() => setOpenModal(false)}>
+                      Confirm
+                      < IoMdCheckmarkCircleOutline fontSize={24} />
+                  </button>
+                </Modal.Footer>
+              </Modal>
+            
+
+          <button className='flex justify-center items-center gap-4 text-white text-md font-inter w-[70%] bg-lightBlue w-full font-semibold py-6  rounded-xl'>
+            Confirm Withdrawal
+            <FaChevronRight />
+          </button>
         </div>
+
+
+
+
+
 
         <div className='my-5 gap-10 h-[300px] justify-start bg-navyBlue px-8 py-8 flex flex-col rounded-3xl overflow-y-auto overflow-x-hidden'>
           
