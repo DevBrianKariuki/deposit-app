@@ -120,7 +120,7 @@ const Home = () => {
                     </button>
                   </div>
                 </Modal.Body>
-              </Modal>
+        </Modal>
 
 
 
