@@ -6,7 +6,6 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io"
 
 const Transactions = () => {
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
-  console.log(openTransactionModal)
   return (
     <div id='transactions' className='bg-background h-full w-full overflow-hidden'>
 
