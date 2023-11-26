@@ -18,6 +18,7 @@ const Home = () => {
 
   const ref = collection(firestore, "deposits");
   const ref2 = collection(firestore, "withdrawals");
+  const ref3 = collection(firestore, "transactions");
 
   let depositMade = ''
   let cashDeposited = ''
@@ -57,12 +58,19 @@ const Home = () => {
       Date: calendar,
       Deposited : depositMade,
       Reason: reason,
-      Type : 'Debit'
+      Description: 'Daily Deposit',
+      Type : 'Debit',
+      Initial : 'D'
     }
 
     try {
       await addDoc(ref, transaction);
-      console.log("Success: Transaction added!")
+        try {
+          await addDoc(ref3, transaction)
+          console.log("Success: Transaction added!")
+        } catch (e) {
+          console.log(e)
+        }
       // window.location.replace('/reserved')
     } catch (e) {
       console.error("Error adding transaction: ", e);
@@ -86,15 +94,23 @@ const Home = () => {
     }else{
 
       let withdrawal ={
-        amount: withdrawalAmount,
-        reason: WithdrawalReason,
-        date: calendar,
-        type: 'Credit'
+
+        Amount: withdrawalAmount,
+        Reason: WithdrawalReason,
+        Date: calendar,
+        Description: 'Withdrawal',
+        Type: 'Credit',
+        Initial: 'W'
       }
 
       try { 
         await addDoc(ref2, withdrawal);
-        console.log("Success: Withdrawal Confirmed added!")
+          try {
+            await addDoc(ref3, withdrawal)
+            console.log("Success: Withdrawal Confirmed added!")
+          } catch (error) {
+            console.log(error)
+          }
       } catch (e) {
         console.error("Error adding withdrawal: ", e);
       }
@@ -207,7 +223,7 @@ const Home = () => {
                           value={ calendar }
                           readOnly
                           className="rounded-xl bg-gray-50 border text-background font-inter font-medium text-xl focus:ring-orange focus:border-orange block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
-                          onClick={() => setOpen(!open) }
+                          onClick={() => setOpen(!open)} onChange={() => setOpen(false) }
                         />
 
                         <div ref={refOne}>
@@ -215,6 +231,7 @@ const Home = () => {
                             <Calendar
                               date={ new Date() }
                               onChange = { handleSelect }
+                              onClick={() => setOpen(false)}
                               className="font-inter font-semibold rounded-xl calendarElement"
                             />
                           }

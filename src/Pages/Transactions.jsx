@@ -1,12 +1,56 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import styles from '../styles'
 import TransactionCard from '../Components/TransactionCard'
 import { Modal } from 'flowbite-react';
 import { IoMdCheckmarkCircleOutline } from "react-icons/io"
 
+import { firestore } from '../firebase';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
+
 const Transactions = () => {
+
+  const transactionsRef = collection(firestore, "transactions");
   const [openTransactionModal, setOpenTransactionModal] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let allTransaction = [];
+    getDocs(transactionsRef).then((snapshot)=> {
+
+        snapshot.docs.forEach((doc) =>{
+          allTransaction.push({key: doc.id, ...doc.data()})
+        })
+
+        setTransactions(allTransaction)
+        setIsLoading(false)
+
+    } )
+  
+   
+  }, [])
+  
+
+
+  if(isLoading){
+    return (
+    <div id='transactions' className='flex items-center justify-center'> 
+        
+        <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-orange border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
+          role="status">
+          <span
+            className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+          >Loading...</span>
+        </div>
+    </div>
+    )
+  }
+
+
+
   return (
+    
     <div id='transactions' className='bg-background h-full w-full overflow-hidden'>
 
       <div className={`flex flex-col items-center px-4`}>
@@ -15,7 +59,10 @@ const Transactions = () => {
         </div>
 
       <div className='flex flex-col w-full gap-4 rounded-2xl my-5' onClick={() => setOpenTransactionModal(true)}>
-        < TransactionCard type={'D'} amount={'1,200.00'} desc={'Daily deposits'} date={'12 Nov 2023'}/>
+          { transactions.map((transaction) => (
+              < TransactionCard key={transaction.key} type={transaction.Initial} amount={transaction.Amount} desc={transaction.Description} date={transaction.Date}/>
+          ) ) }
+      
       </div>
 
       <Modal dismissible className='bg-lightblue border-none h-[400px]' show={openTransactionModal} onClose={() => setOpenTransactionModal(false)}>
