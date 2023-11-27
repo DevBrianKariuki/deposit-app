@@ -5,16 +5,24 @@ import { Modal } from 'flowbite-react';
 import { IoMdCheckmarkCircleOutline } from "react-icons/io"
 import { Calendar } from 'react-date-range'
 import format from 'date-fns/format'
+import { HiFire } from 'react-icons/hi';
+import { Button, Toast } from 'flowbite-react';
+import { GiPartyPopper } from "react-icons/gi";
 
 import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 
 import { firestore } from '../firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, getDocs } from 'firebase/firestore';
 
 
 
 const Home = () => {
+
+  const balanceRef = collection(firestore, "balances");
+  const [balances, setBalances] = useState([]);
+  const [isLoading, setIsLoading] = useState(true)
+
 
   const ref = collection(firestore, "deposits");
   const ref2 = collection(firestore, "withdrawals");
@@ -54,7 +62,7 @@ const Home = () => {
     }
 
     let transaction = {
-      Amount : cashDeposited,
+      Amount : Number(cashDeposited),
       Date: calendar,
       Deposited : depositMade,
       Reason: reason,
@@ -68,6 +76,9 @@ const Home = () => {
         try {
           await addDoc(ref3, transaction)
           console.log("Success: Transaction added!")
+          setShowToast((state) => !state)
+          setOpenModal(false)
+
         } catch (e) {
           console.log(e)
         }
@@ -75,7 +86,6 @@ const Home = () => {
     } catch (e) {
       console.error("Error adding transaction: ", e);
     }
-
 
     console.log(transaction);
   }
@@ -95,7 +105,7 @@ const Home = () => {
 
       let withdrawal ={
 
-        Amount: withdrawalAmount,
+        Amount: Number(withdrawalAmount),
         Reason: WithdrawalReason,
         Date: calendar,
         Description: 'Withdrawal',
@@ -107,6 +117,8 @@ const Home = () => {
         await addDoc(ref2, withdrawal);
           try {
             await addDoc(ref3, withdrawal)
+            setShowToast((state) => !state)
+            setOpenWithdrawModal(false)
             console.log("Success: Withdrawal Confirmed added!")
           } catch (error) {
             console.log(error)
@@ -132,6 +144,7 @@ const Home = () => {
 
   const [withdrawalAmount, setWithdrawalAmount] = useState('');
   const [WithdrawalReason, setWithdrawalReason] = useState('');
+  const [showToast, setShowToast] = useState(false);
 
 
 
@@ -143,6 +156,8 @@ const Home = () => {
 
     // open close
     const [open, setOpen] = useState(false)
+
+    const [toggle, setToggle] = useState(false)
   
     // get the target element to toggle 
     const refOne = useRef(null)
@@ -154,19 +169,16 @@ const Home = () => {
       document.addEventListener("keydown", hideOnEscape, true)
       document.addEventListener("click", hideOnClickOutside, true)
     }, [])
-  
-    // hide dropdown on ESC press
+
     const hideOnEscape = (e) => {
-      // console.log(e.key)
+  
       if( e.key === "Escape" ) {
         setOpen(false)
       }
     }
   
-    // Hide on outside click
+
     const hideOnClickOutside = (e) => {
-      // console.log(refOne.current)
-      // console.log(e.target)
       if( refOne.current && !refOne.current.contains(e.target) ) {
         setOpen(false)
       }
@@ -181,6 +193,40 @@ const Home = () => {
 //////////////////////////////////////////////////End of Date Selection///////////////////////////////////////////////////
 
 
+useEffect(() => {
+  let balance = [];
+  getDocs(balanceRef).then((snapshot)=> {
+
+      snapshot.docs.forEach((doc) =>{
+        balance.push({key: doc.id, ...doc.data()})
+      })
+
+      setBalances(balance)
+      setIsLoading(false)
+
+  } )
+ 
+}, [])
+
+console.log(balances)
+
+if(isLoading){
+  return (
+  <div id='transactions' className='flex items-center justify-center'> 
+      
+      <div
+        className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-orange border-current border-r-transparent align-[-0.125em] text-primary motion-reduce:animate-[spin_1.5s_linear_infinite]"
+        role="status">
+        <span
+          className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
+        >Loading...</span>
+      </div>
+  </div>
+  )
+}
+
+
+
   return (
     <div id='home' className='bg-background w-full overflow-hidden '>
 
@@ -190,10 +236,23 @@ const Home = () => {
         </div>
 
         <div className='bg-navyBlue shadow-md gap-4 my-5 flex flex-col items-center justify-center w-full rounded-3xl p-12'>
-          <h1 className={`font-inter text-white font-black text-4xl`}>Ksh 39,650.00</h1>
+          <h1 className={`font-inter text-white font-black text-4xl`}>{balances.map((balance, key) =>(
+            <p>Ksh {balance.balances}.00</p>
+          ))}</h1>
           <p className='uppercase font-normal text-sm font-inter text-lightGray'>available account balance</p>
         </div>
-        
+
+        {showToast && (
+          <Toast className='absolute z-5 w-full top-0'>
+            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+              <GiPartyPopper className="h-5 w-5" />
+            </div>
+            <div className="ml-3 text-background text-sm font-normal">Transaction saved succesfully!</div>
+            <Toast.Toggle onDismiss={() => setShowToast(false)} />
+          </Toast>
+        )}
+
+
         <div className='flex flex-col items-center my-5 gap-5'>
           <button  className='text-white flex justify-center items-center gap-4  text-md w-[70%] font-inter bg-orange w-full font-semibold py-6 rounded-xl'
           onClick={() => setOpenModal(true)}>
@@ -221,24 +280,22 @@ const Home = () => {
                       <div className="calendarWrap">
                         <input
                           value={ calendar }
-                          readOnly
                           className="rounded-xl bg-gray-50 border text-background font-inter font-medium text-xl focus:ring-orange focus:border-orange block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
-                          onClick={() => setOpen(!open)} onChange={() => setOpen(false) }
+                          onClick={() => setToggle(!toggle)} onChange={() => setToggle(false) }
                         />
 
                         <div ref={refOne}>
-                          {open && 
+                          {toggle && 
                             <Calendar
-                              date={ new Date() }
+                              date ={ new Date() }
                               onChange = { handleSelect }
-                              onClick={() => setOpen(false)}
+                              onClick={() => setToggle(false)}
                               className="font-inter font-semibold rounded-xl calendarElement"
                             />
                           }
                         </div>
 
                       </div>
-                      {/* <Datepicker  className='w-full items-center justify-between font-medium font-inter' autoHide={true} minDate={new Date(2023, 8, 24)} /> */}
                   </div>
 {/* //////////////////////////////////////Select Date/////////////////////////////////////////////////////////////// */}
 
@@ -247,13 +304,13 @@ const Home = () => {
                       <div className='flex gap-6'>
                         <div className="flex items-center me-4">
                             <input  type="radio" onClick={() => setDeposited(true)} value="Yes" name="inline-radio-group" className="w-4 h-4 text-orange bg-gray-100 border-gray-300 focus:ring-orange focus:ring-1"
-                            // onClick={() => setOpenReason(false)}
+                            
                             />
                             <label  className="ms-2 text-lg font-inter font-medium text-background ">Yes</label>
                         </div>
                         <div className="flex items-center me-4">
                             <input type="radio" onClick={() => setDeposited(false) }  value="No" name="inline-radio-group" className="w-4 h-4 text-orange bg-gray-100 border-gray-300 focus:ring-orange focus:ring-1"
-                            // onClick={() => setOpenReason(true)}
+                            
                             />
                             <label className="ms-2 font-medium text-background text-lg font-inter">No</label>
                         </div>
@@ -267,7 +324,7 @@ const Home = () => {
 
                   <div className="flex items-center mt-6 justify-center">
                     <button type='submit' className="bg-orange font-inter text-lg flex items-center gap-3 font-semibold rounded-xl text-white px-12 py-4" 
-                      onClick={handleDeposit}
+                      // onClick={handleDeposit}
                       // onClick={() => setOpenModal(false)}
                       >
                         Confirm
