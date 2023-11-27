@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 
 import { firestore } from '../firebase';
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 
 
 
@@ -75,9 +75,17 @@ const Home = () => {
       await addDoc(ref, transaction);
         try {
           await addDoc(ref3, transaction)
-          console.log("Success: Transaction added!")
-          setShowToast((state) => !state)
-          setOpenModal(false)
+
+          const balanceReference = doc(firestore, 'balances', 'Ygdp1HplqEu7ZPd5tPI3')
+          let currentBalance = ''
+          getDocs(balanceReference).then((snapshot) => {
+            snapshot.docs
+            console.log(snapshot.docs)
+          })
+
+          // console.log("Success: Transaction added!")
+          // setShowToast((state) => !state)
+          // setOpenModal(false)
 
         } catch (e) {
           console.log(e)
@@ -130,6 +138,10 @@ const Home = () => {
   
       console.log(withdrawal);
     }
+  }
+
+  const updateBalance = async (balance) => {
+      
   }
 
 
@@ -237,7 +249,7 @@ if(isLoading){
 
         <div className='bg-navyBlue shadow-md gap-4 my-5 flex flex-col items-center justify-center w-full rounded-3xl p-12'>
           <h1 className={`font-inter text-white font-black text-4xl`}>{balances.map((balance, key) =>(
-            <p>Ksh {balance.balances}.00</p>
+            <p>Ksh {balance.balances }.00</p>
           ))}</h1>
           <p className='uppercase font-normal text-sm font-inter text-lightGray'>available account balance</p>
         </div>
