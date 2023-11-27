@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 
 import { firestore } from '../firebase';
-import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, getDoc, setDoc } from 'firebase/firestore';
 
 
 
@@ -76,16 +76,30 @@ const Home = () => {
         try {
           await addDoc(ref3, transaction)
 
-          const balanceReference = doc(firestore, 'balances', 'Ygdp1HplqEu7ZPd5tPI3')
-          let currentBalance = ''
-          getDocs(balanceReference).then((snapshot) => {
-            snapshot.docs
-            console.log(snapshot.docs)
+          const docRef = doc(firestore, 'balances', 'Ygdp1HplqEu7ZPd5tPI3')
+          const balanceSnapshot = await getDoc(docRef)
+          let balanceDetails = balanceSnapshot.data()
+
+          let currentBalance = balanceDetails.balances
+          let newBalance = Number(currentBalance) + Number(cashDeposited)
+
+          let currentDeposited = balanceDetails.deposited
+          let newDeposited = Number(currentDeposited) + Number(cashDeposited)
+
+          const newData = {
+            balances : newBalance,
+            deposited : newDeposited
+          }
+
+          setDoc(docRef, newData, {merge : true}).then( (docRef) =>{
+            console.log('Data Updated Succesfully')
+          }).catch(error =>{
+            console.log(error)
           })
 
-          // console.log("Success: Transaction added!")
-          // setShowToast((state) => !state)
-          // setOpenModal(false)
+          console.log("Success: Transaction added!")
+          setShowToast((state) => !state)
+          setOpenModal(false)
 
         } catch (e) {
           console.log(e)
@@ -125,6 +139,29 @@ const Home = () => {
         await addDoc(ref2, withdrawal);
           try {
             await addDoc(ref3, withdrawal)
+
+            const docRef = doc(firestore, 'balances', 'Ygdp1HplqEu7ZPd5tPI3')
+            const balanceSnapshot = await getDoc(docRef)
+            let balanceDetails = balanceSnapshot.data()
+
+            let currentBalance = balanceDetails.balances
+            let newBalance = Number(currentBalance) - Number(withdrawalAmount)
+
+            let currentWithdrawn = balanceDetails.withdrawn
+            let newWithdrawn = Number(currentWithdrawn) + Number(withdrawalAmount)
+
+            const newData = {
+              balances : newBalance,
+              withdrawn : newWithdrawn
+            }
+
+            setDoc(docRef, newData, {merge : true}).then( (docRef) =>{
+              console.log('Data Updated Succesfully')
+
+            }).catch(error =>{
+              console.log(error)
+            })
+
             setShowToast((state) => !state)
             setOpenWithdrawModal(false)
             console.log("Success: Withdrawal Confirmed added!")
@@ -138,10 +175,6 @@ const Home = () => {
   
       console.log(withdrawal);
     }
-  }
-
-  const updateBalance = async (balance) => {
-      
   }
 
 
@@ -256,8 +289,8 @@ if(isLoading){
 
         {showToast && (
           <Toast className='absolute z-5 w-full top-0'>
-            <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-              <GiPartyPopper className="h-5 w-5" />
+            <div className="inline-flex h-8 w-8 shrink-0 font-inter items-center justify-center rounded-lg bg-cyan-100 text-orange">
+              <GiPartyPopper className="h-5 text-white w-5" />
             </div>
             <div className="ml-3 text-background text-sm font-normal">Transaction saved succesfully!</div>
             <Toast.Toggle onDismiss={() => setShowToast(false)} />
