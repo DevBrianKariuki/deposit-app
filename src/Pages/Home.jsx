@@ -218,14 +218,14 @@ const Home = () => {
     const hideOnEscape = (e) => {
   
       if( e.key === "Escape" ) {
-        setOpen(false)
+        setToggle(false)
       }
     }
   
 
     const hideOnClickOutside = (e) => {
       if( refOne.current && !refOne.current.contains(e.target) ) {
-        setOpen(false)
+        setToggle(false)
       }
     }
   
@@ -322,7 +322,7 @@ if(isLoading){
 
 {/* //////////////////////////////////////Select Date/////////////////////////////////////////////////////////////// */}
                   <div className='flex gap-2 my-8 mx-4'>
-                      <div className="calendarWrap">
+                      <div className="w-full calendarWrap">
                         <input
                           value={ calendar }
                           className="rounded-xl bg-gray-50 border text-background font-inter font-medium text-xl focus:ring-orange focus:border-orange block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
@@ -403,25 +403,25 @@ if(isLoading){
                   </div>
 
                   <div className='flex gap-2 my-8 mx-4'>
-                      <div className="calendarWrap">
-                        <input
-                          value={ calendar }
-                          readOnly
-                          className="rounded-xl bg-gray-50 border text-background font-inter font-medium text-xl focus:ring-orange focus:border-orange block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
-                          onClick={() => setOpen(!open) }
-                        />
+                    <div className="w-full calendarWrap">
+                          <input
+                            value={ calendar }
+                            className="rounded-xl bg-gray-50 border text-background font-inter font-medium text-xl focus:ring-orange focus:border-orange block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5"
+                            onClick={() => setToggle(!toggle)} onChange={() => setToggle(false) }
+                          />
 
-                        <div ref={refOne}>
-                          {open && 
-                            <Calendar
-                              date={ new Date() }
-                              onChange = { handleSelect }
-                              className="font-inter font-semibold rounded-xl calendarElement"
-                            />
-                          }
+                          <div ref={refOne}>
+                            {toggle && 
+                              <Calendar
+                                date ={ new Date() }
+                                onChange = { handleSelect }
+                                onClick={() => setToggle(true)}
+                                className="font-inter font-semibold rounded-xl calendarElement"
+                              />
+                            }
+                          </div>
+
                         </div>
-
-                      </div>
                   </div>
 
                   <div className={` flex  flex-col mx-4 my-8`}>

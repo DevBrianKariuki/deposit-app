@@ -94,7 +94,7 @@ const Reports = () => {
         </div>
 
         {/* Search bar */}
-        <div className='my-4 p-2 flex gap-3 items-center'>
+        <div className='my-4 p-2 flex w-full gap-3 items-center'>
           <input className='bg-navyBlue px-9 py-4 flex-1 text-white font-inter rounded-lg outline-none' type="search" placeholder='Search' />
           <button className='w-[50px] h-[50px] bg-orange flex items-center justify-center rounded-lg'>
             <FaSearchDollar className='text-white' fontSize={22} />
